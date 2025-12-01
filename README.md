@@ -2,4 +2,4 @@ My attempt at the Advent of Code 2025 challenges at https://adventofcode.com/202
 
 Written using node.js.
 
-Execute challenge by updating `index.js` with the day to be run and then run `npm run start` in the terminal.
+Execute challenge by running `npm run day x` in the terminal, where x is the day number to run
