@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "day1": "node Day1/day1.js",
-    "day2": "node Day2/day2.js"
+    "day2": "node Day2/day2.js",
+    "day3": "node Day3/day3.js"
   },
   "keywords": [],
   "author": "Josh Hughes",
