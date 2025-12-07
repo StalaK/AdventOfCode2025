@@ -3,12 +3,12 @@
 import fs from "node:fs";
 
 export default function Day6() {
-  const dataRaw = fs.readFileSync("Day6/day6.sample.txt", "utf8");
+  const dataRaw = fs.readFileSync("Day6/day6.txt", "utf8");
   const data = dataRaw.split("\n").filter((line) => line.trim());
 
   const lastRow = data.length - 1;
 
- //Part1(data, lastRow);
+  Part1(data, lastRow);
   Part2(data, lastRow);
 }
 
@@ -35,8 +35,35 @@ function Part1(data, lastRow) {
 }
 
 function Part2(data, lastRow) {
-  let dataArray = [...data.map((x) => x.split("  "))];
-  console.log(dataArray)
+  const tempDataArray = [...data.map((x) => x.split(" ").filter((y) => y.trim()))];
+
+  let colFrameSizes = [];
+  for (let row = 0; row < tempDataArray.length; row++) {
+    for (let col = 0; col < tempDataArray[row].length; col++) {
+      colFrameSizes[col] = Math.max(colFrameSizes[col] ?? 0, tempDataArray[row][col].length);
+    }
+  }
+
+  let dataArray = [];
+  for (let row = 0; row < data.length; row++) {
+    let newRow = [];
+    let col = 0;
+    let i = 0;
+
+    while (i < data[row].length) {
+      newRow.push(
+        row === lastRow
+          ? data[row].slice(i, i + colFrameSizes[col]).trim()
+          : data[row].slice(i, i + colFrameSizes[col]).replaceAll(" ", "*")
+      );
+
+      i += colFrameSizes[col] + 1;
+      col++;
+    }
+
+    dataArray.push(newRow);
+  }
+
   let part2Total = 0;
 
   for (let col = 0; col < dataArray[0].length; col++) {
@@ -48,30 +75,22 @@ function Part2(data, lastRow) {
       columnNumbers.push(dataArray[row][col]);
     }
 
-    const longestNumber = columnNumbers.reduce((x,y) => x.length > y.length ? x : y).length;
-    columnNumbers = columnNumbers.map(x => x.padEnd(longestNumber, "*"));
-
     let cephalopodNumbers = [];
 
-    for (let i = 0; i < longestNumber; i++) {
+    for (let i = 0; i < colFrameSizes[col]; i++) {
       let cephalopodNumber = "";
-
       for (let j = 0; j < columnNumbers.length; j++) {
-        cephalopodNumber += columnNumbers[j][i].replace("*", "");
+        cephalopodNumber += columnNumbers[j][i] === "*" ? "" : columnNumbers[j][i];
       }
 
       cephalopodNumbers.push(cephalopodNumber);
     }
 
-    // console.log(columnNumbers);
-    // console.log(cephalopodNumbers);
-    // console.log("\n\n")
-
-    for (let row = 0; row < lastRow; row++) {
+    for (let num = 0; num < cephalopodNumbers.length; num++) {
       if (operand === "+" || columnTotal === 0) {
-        columnTotal += Number(dataArray[row][col]);
+        columnTotal += Number(cephalopodNumbers[num]);
       } else {
-        columnTotal *= Number(dataArray[row][col]);
+        columnTotal *= Number(cephalopodNumbers[num]);
       }
     }
 
