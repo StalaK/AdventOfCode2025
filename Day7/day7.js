@@ -3,7 +3,7 @@
 import fs from "node:fs";
 
 export default function Day7() {
-  const dataRaw = fs.readFileSync("Day7/day7.txt", "utf8");
+  const dataRaw = fs.readFileSync("Day7/day7.sample.txt", "utf8");
   const data = dataRaw.split("\n").filter((line) => line.trim());
 
   //Part1(data);
@@ -21,10 +21,12 @@ function Part1(data) {
 
     if (down < data.length) {
       if (data[down][x] === "^") {
-        if (!(
-          explored.find((pos) => pos.x === x - 1 && pos.y === down) &&
-          explored.find((pos) => pos.x === x + 1 && pos.y === down)
-        )) {
+        if (
+          !(
+            explored.find((pos) => pos.x === x - 1 && pos.y === down) &&
+            explored.find((pos) => pos.x === x + 1 && pos.y === down)
+          )
+        ) {
           if (!explored.find((pos) => pos.x === x + 1 && pos.y === down)) {
             toExplore.push({ x: x + 1, y: down });
             beamPaths++;
@@ -51,36 +53,37 @@ function Part1(data) {
 function Part2(data) {
   let toExplore = [{ x: data[0].indexOf("S"), y: 0 }];
   let explored = [];
-  let splitCount = 1;
+  let splitCount = 0;
 
   while (toExplore.length > 0) {
     let { x, y } = toExplore.shift();
+    console.log(`Exploring x:${x} y:${y} -- toExplore length: ${toExplore.length}`);
+    explored.push({ x, y });
     const down = y + 1;
 
     if (down < data.length) {
       if (data[down][x] === "^") {
-        if (!(
-          explored.find((pos) => pos.x === x - 1 && pos.y === down) &&
-          explored.find((pos) => pos.x === x + 1 && pos.y === down)
-        )) {
-          if (!explored.find((pos) => pos.x === x + 1 && pos.y === down)) {
-            toExplore.push({ x: x + 1, y: down });
-          }
+        if (!explored.find((pos) => pos.x === x + 1 && pos.y === down && !toExplore.find((pos) => pos.x === x + 1 && pos.y === down))) {
+          toExplore.push({ x: x + 1, y: down });
+        }
 
-          if (!explored.find((pos) => pos.x === x - 1 && pos.y === down)) {
-            toExplore.push({ x: x - 1, y: down });
-          }
-
-          splitCount++;
+        if (!explored.find((pos) => pos.x === x - 1 && pos.y === down) && !toExplore.find((pos) => pos.x === x - 1 && pos.y === down)) {
+          toExplore.push({ x: x - 1, y: down });
         }
       } else {
-        toExplore.push({ x, y: down });
+        if (!explored.find((pos) => pos.x === x && pos.y === down) && !toExplore.find((pos) => pos.x === x && pos.y === down)) {
+          toExplore.push({ x, y: down });
+        }
       }
+    } else {
+      console.log("Plus one");
+      splitCount++;
     }
 
-    explored.push({ x, y });
+    
   }
 
   console.log("Part 2:", splitCount);
 }
 
+Day7();
