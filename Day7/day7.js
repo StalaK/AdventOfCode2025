@@ -3,10 +3,10 @@
 import fs from "node:fs";
 
 export default function Day7() {
-  const dataRaw = fs.readFileSync("Day7/day7.sample.txt", "utf8");
+  const dataRaw = fs.readFileSync("Day7/day7.txt", "utf8");
   const data = dataRaw.split("\n").filter((line) => line.trim());
 
-  //Part1(data);
+  Part1(data);
   Part2(data);
 }
 
@@ -29,12 +29,10 @@ function Part1(data) {
         ) {
           if (!explored.find((pos) => pos.x === x + 1 && pos.y === down)) {
             toExplore.push({ x: x + 1, y: down });
-            beamPaths++;
           }
 
           if (!explored.find((pos) => pos.x === x - 1 && pos.y === down)) {
             toExplore.push({ x: x - 1, y: down });
-            beamPaths++;
           }
 
           splitCount++;
@@ -51,39 +49,30 @@ function Part1(data) {
 }
 
 function Part2(data) {
-  let toExplore = [{ x: data[0].indexOf("S"), y: 0 }];
   let explored = [];
-  let splitCount = 0;
-
-  while (toExplore.length > 0) {
-    let { x, y } = toExplore.shift();
-    console.log(`Exploring x:${x} y:${y} -- toExplore length: ${toExplore.length}`);
-    explored.push({ x, y });
-    const down = y + 1;
-
-    if (down < data.length) {
-      if (data[down][x] === "^") {
-        if (!explored.find((pos) => pos.x === x + 1 && pos.y === down && !toExplore.find((pos) => pos.x === x + 1 && pos.y === down))) {
-          toExplore.push({ x: x + 1, y: down });
-        }
-
-        if (!explored.find((pos) => pos.x === x - 1 && pos.y === down) && !toExplore.find((pos) => pos.x === x - 1 && pos.y === down)) {
-          toExplore.push({ x: x - 1, y: down });
-        }
-      } else {
-        if (!explored.find((pos) => pos.x === x && pos.y === down) && !toExplore.find((pos) => pos.x === x && pos.y === down)) {
-          toExplore.push({ x, y: down });
-        }
-      }
-    } else {
-      console.log("Plus one");
-      splitCount++;
-    }
-
-    
-  }
-
-  console.log("Part 2:", splitCount);
+  let pathCount = explore(data, data[0].indexOf("S"), 0, explored);
+  console.log("Part 2:", pathCount);
 }
 
-Day7();
+function explore(data, x, y, explored) {
+  if (y >= data.length-1)
+    return 1;
+  
+  let prev = explored.find(val => val.x === x && val.y === y);
+  if (prev) {
+    return prev.count;
+  }
+
+  let count = 0;
+
+  if (data[y][x] === "^") {
+    count += explore(data, x+1, y+1, explored);
+    count += explore(data, x-1, y+1, explored);
+
+  } else {
+    count += explore(data, x, y+1, explored);
+  }
+
+  explored.push({ x:x, y:y, count: count});
+  return count;
+}
